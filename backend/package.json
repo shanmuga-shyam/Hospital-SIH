@@ -1,0 +1,30 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yashwanth1906/Hospital-SIH.git"
+  },
+  "author": "Yashwanth S",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yashwanth1906/Hospital-SIH/issues"
+  },
+  "homepage": "https://github.com/Yashwanth1906/Hospital-SIH#readme",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^5.18.0",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.4",
+    "prisma": "^5.18.0",
+    "validator": "^13.12.0"
+  }
+}
