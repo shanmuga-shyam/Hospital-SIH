@@ -184,7 +184,7 @@ model Inventory {
   price Float
   reorderLevel Int
   lastOrderDate DateTime @default(now())
-  expiryDate DateTime
+  stockBatches Json[] 
   hospitalId String
   hospital Hospitals @relation(fields: [hospitalId], references: [id])
 }

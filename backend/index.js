@@ -31,3 +31,10 @@ app.post("/test",async (req,res)=>{
         res.json({success:false,message:err});
     }
 })
+
+app.delete("/delete",async(req,res)=>{
+    await prisma.inventory.deleteMany({
+
+    })
+    res.json({success:true,message:"Successfully Deleted"})
+})
