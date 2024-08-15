@@ -1,4 +1,4 @@
-import { HospitalType, PrismaClient } from "@prisma/client";
+import {  PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs"
 import validator from "validator"
 import jwt from "jsonwebtoken"

@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_LOCAL")
 }
 
 model Hospitals {
@@ -41,9 +41,9 @@ enum HospitalType {
 model Doctors {
     id String @id @default(uuid())
     name String
-    specialization String
     contact String
     email String
+    password String
     avaliableSlots Json
     departmentId String
     department Departments @relation(fields: [departmentId], references: [id])

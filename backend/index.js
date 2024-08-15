@@ -2,6 +2,7 @@ import express from "express"
 import { PrismaClient } from "@prisma/client";
 import { hospitalRouter } from "./routes/hospitalRoutes.js";
 import { inventoryRouter } from "./routes/inventoryRoute.js";
+import { doctorRouter } from "./routes/doctorRoute.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -13,8 +14,7 @@ app.listen(process.env.BACKEND_PORT,()=>{
 
 app.use("/api/hospital",hospitalRouter)
 app.use("/api/inventory",inventoryRouter)
-
-
+app.use("/api/doctor",doctorRouter)
 
 
 app.post("/test",async (req,res)=>{
@@ -38,3 +38,4 @@ app.delete("/delete",async(req,res)=>{
     })
     res.json({success:true,message:"Successfully Deleted"})
 })
+

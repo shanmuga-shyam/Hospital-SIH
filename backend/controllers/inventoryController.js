@@ -1,4 +1,4 @@
-import { InventoryCategory, PrismaClient } from "@prisma/client";
+import {  PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -101,18 +101,25 @@ const editExistingItem = async(req,res)=>{
                     id:itemId
                 }
             })
+            console.log(inventoryItem)
             const existingBatch = inventoryItem.stockBatches.find(batch =>{
                 if(new Date(batch.expiryDate).getTime() === new Date(expiryDate).getTime()){
                     batch.expiryDate = new Date(expiryDate).getTime();
                 }
             })
-            if(existingBatch){
-                
+            if(!existingBatch){
+                res.json({success:true,mesagge:"Updated Succesfully"});
             }
+            
         }
     }catch(err){
         console.log(err);
         res.json({success:false,message:err})
     }
 }
+
+
+
+
+
 export {add,listInventory,patientBuys,editExistingItem}
