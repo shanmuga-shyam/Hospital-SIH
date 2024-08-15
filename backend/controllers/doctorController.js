@@ -11,7 +11,7 @@ const doctorRegister = async(req,res) =>{
         contact:contact,
         email:email,
         password:password,
-        availableSlots:availableSlots,
+        active:true,
         departmentId:departmentId,
         hospitalId:hospitalId
     })
