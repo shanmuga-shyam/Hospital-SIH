@@ -33,6 +33,14 @@ model Hospitals {
     patient PatientInstance[]
 }
 
+model OTPVerification{
+    id String @id @default(uuid())
+    email String @unique
+    otp String
+    createdAt DateTime @default(now())
+    expiresAt DateTime
+}
+
 
 enum HospitalType {
   Private
@@ -58,7 +66,7 @@ model Doctors {
 model Departments {
   id String @id @default(uuid())
   name String
-  headOfDepartmentId String
+  headOfDepartmentId String @default(" ")
   hospitalId String
   hospital Hospitals @relation(fields: [hospitalId], references: [id])
   doctors Doctors[]
