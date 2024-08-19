@@ -20,7 +20,6 @@ import { Pharmacy } from './pages/inventory/pharmacy';
 import { Ward } from './pages/inventory/ward';
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
