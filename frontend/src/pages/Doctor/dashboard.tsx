@@ -42,9 +42,9 @@ export function DoctorDashBoard() {
   ]);
 
   const statusColors = {
-    Waiting: "bg-red-500 text-red-50",
-    "In Progress": "bg-yellow-500 text-yellow-50",
-    Completed: "bg-green-500 text-green-50",
+    Waiting: "bg-red-500 text-black-500",
+    "In Progress": "bg-yellow-500 text-black-500",
+    Completed: "bg-green-500 text-black-500",
   };
 
   return (

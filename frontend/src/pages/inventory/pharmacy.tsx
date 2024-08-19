@@ -1,31 +1,45 @@
-import React, { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { ChartTooltipContent, ChartTooltip, ChartContainer } from "@/components/ui/chart";
-import { Pie, PieChart, CartesianGrid, XAxis, Line, LineChart } from "recharts";
+import React, { useState, useMemo } from "react"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { CartesianGrid, XAxis, Line, LineChart, Pie, PieChart } from "recharts"
+import { ChartTooltipContent, ChartTooltip, ChartContainer } from "@/components/ui/chart"
+import { PlusIcon } from "@heroicons/react/24/outline" // Adjust import path as necessary
 
-// Define the types for your inventory items
 interface InventoryItem {
-  id: number;
-  name: string;
-  category: string;
-  quantity: number;
-  price: number;
-  inStock: boolean;
-  reorderLevel: number;
-  lastOrderDate: string;
-  expiryDate: string;
+  id: number
+  name: string
+  category: string
+  quantity: number
+  price: number
+  inStock: boolean
+  reorderLevel: number
+  lastOrderDate: string
+  expiryDate: string
 }
 
-export function Pharmacy() {
-  const [searchTerm, setSearchTerm] = useState<string>("");
+interface NewItem {
+  name: string
+  category: string
+  quantity: number
+  price: number
+  inStock: boolean
+  reorderLevel: number
+  lastOrderDate: string
+  expiryDate: string
+}
+
+export const Pharmacy: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState<string>("")
   const [inventory, setInventory] = useState<InventoryItem[]>([
     {
       id: 1,
       name: "Widget A",
-      category: "Pharmacy",
+      category: "Industrial",
       quantity: 50,
       price: 19.99,
       inStock: true,
@@ -36,7 +50,7 @@ export function Pharmacy() {
     {
       id: 2,
       name: "Gadget B",
-      category: "Pharmacy",
+      category: "Consumer",
       quantity: 25,
       price: 9.99,
       inStock: true,
@@ -47,7 +61,7 @@ export function Pharmacy() {
     {
       id: 3,
       name: "Doohickey C",
-      category: "Pharmacy",
+      category: "Professional",
       quantity: 10,
       price: 49.99,
       inStock: false,
@@ -58,7 +72,7 @@ export function Pharmacy() {
     {
       id: 4,
       name: "Thingamajig D",
-      category: "Pharmacy",
+      category: "Home",
       quantity: 75,
       price: 14.99,
       inStock: true,
@@ -68,8 +82,8 @@ export function Pharmacy() {
     },
     {
       id: 5,
-      name: "Whatcham E",
-      category: "Pharmacy",
+      name: "Whatchamacallit E",
+      category: "Specialty",
       quantity: 5,
       price: 99.99,
       inStock: false,
@@ -77,21 +91,81 @@ export function Pharmacy() {
       lastOrderDate: "2023-05-01",
       expiryDate: "2024-03-31",
     },
-  ]);
-  const [showWard, setShowWard] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  ])
+  const [showPharmacy, setShowPharmacy] = useState<boolean>(false)
+  const [showCategoryForm, setShowCategoryForm] = useState<boolean>(false)
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
+  const [newCategory, setNewCategory] = useState<string>("")
+  const [newItem, setNewItem] = useState<NewItem>({
+    name: "",
+    category: "Medicine",
+    quantity: 0,
+    price: 0,
+    inStock: true,
+    reorderLevel: 0,
+    lastOrderDate: "2023-01-01",
+    expiryDate: "2024-01-01",
+  })
 
   const filteredInventory = useMemo(() => {
-    return inventory.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) && item.quantity < 50
-    );
-  }, [inventory, searchTerm]);
+    if (showPharmacy) {
+      return inventory.filter(
+        (item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()) && item.category === "Specialty",
+      )
+    } else {
+      return inventory.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    }
+  }, [inventory, searchTerm, showPharmacy])
 
-  const totalItems = inventory.length;
-  const availableItems = inventory.filter((item) => item.inStock).length;
-  const outOfStockItems = inventory.filter((item) => !item.inStock).length;
-  const subStoreAvailableItems = filteredInventory.filter((item) => item.inStock).length;
-  const subStoreOutOfStockItems = filteredInventory.filter((item) => !item.inStock).length;
+  const totalItems = inventory.length
+  const availableItems = inventory.filter((item) => item.inStock).length
+  const outOfStockItems = inventory.filter((item) => !item.inStock).length
+  const subStoreAvailableItems = filteredInventory.filter((item) => item.inStock).length
+  const subStoreOutOfStockItems = filteredInventory.filter((item) => !item.inStock).length
+
+  const handleAddItem = () => {
+    setInventory([
+      ...inventory,
+      {
+        id: inventory.length + 1,
+        name: newItem.name,
+        category: newItem.category,
+        quantity: newItem.quantity,
+        price: newItem.price,
+        inStock: true,
+        reorderLevel: newItem.reorderLevel,
+        lastOrderDate: newItem.lastOrderDate,
+        expiryDate: newItem.expiryDate,
+      },
+    ])
+    setNewItem({
+      name: "",
+      category: "Medicine",
+      quantity: 0,
+      price: 0,
+      inStock: true,
+      reorderLevel: 0,
+      lastOrderDate: "2023-01-01",
+      expiryDate: "2024-01-01",
+    })
+    setShowCategoryForm(false)
+  }
+
+  const handleCategorySelect = (category: string) => {
+    setNewItem({ ...newItem, category })
+  }
+
+  const [showPieChart, setShowPieChart] = useState<boolean>(false)
+  const [pieChartData, setPieChartData] = useState<{ name: string; value: number }[]>([])
+
+  const handleItemClick = (item: InventoryItem) => {
+    setSelectedItem(item)
+    setShowPieChart(true)
+    setPieChartData([
+      { name: "In Stock", value: item.inStock ? item.quantity : 0 },
+      { name: "Out of Stock", value: item.inStock ? 0 : item.quantity },
+    ])
+  }
 
   return (
     <div className="flex h-screen">
@@ -101,163 +175,182 @@ export function Pharmacy() {
           <Button
             variant="ghost"
             size="sm"
-            className={`w-full justify-start gap-2 bg-muted`}
+            className={`w-full justify-start gap-2 ${showPharmacy ? "bg-muted" : ""}`}
             onClick={() => {
-              setShowWard(false);
+              setShowPharmacy(true)
+              setShowCategoryForm(false)
             }}
           >
-            <InboxIcon className="w-4 h-4" />
+            
             Pharmacy
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`w-full justify-start gap-2 ${showCategoryForm ? "bg-muted" : ""}`}
+            onClick={() => {
+              setShowPharmacy(false)
+              setShowCategoryForm(true)
+            }}
+          >
+            <PlusIcon className="w-4 h-4" />
+            Add Item
           </Button>
         </div>
       </div>
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-        <div className="bg-background rounded-lg shadow-md p-6 flex-1">
-          <h2 className="text-xl font-bold mb-4">Pharmacy Inventory</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-card rounded-lg p-4">
-              <h3 className="text-lg font-bold mb-2">Total Items</h3>
-              <p className="text-4xl font-bold">{filteredInventory.length}</p>
-            </div>
-            <div className="bg-card rounded-lg p-4">
-              <h3 className="text-lg font-bold mb-2">Available</h3>
-              <p className="text-4xl font-bold">{subStoreAvailableItems}</p>
-            </div>
-            <div className="bg-card rounded-lg p-4">
-              <h3 className="text-lg font-bold mb-2">Out of Stock</h3>
-              <p className="text-4xl font-bold">{subStoreOutOfStockItems}</p>
-            </div>
-          </div>
-          <div className="relative mt-4">
-            <SearchIcon className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search for an item..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg bg-card pl-10 pr-4 py-2 text-foreground"
-            />
-          </div>
-          <div className="mt-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>In Stock</TableHead>
-                  <TableHead>Reorder Level</TableHead>
-                  <TableHead>Last Order Date</TableHead>
-                  <TableHead>Expiry Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredInventory.map((item) => (
-                  <TableRow
-                    key={item.id}
-                    onClick={() => setSelectedItem(item)}
-                    className="cursor-pointer hover:bg-muted"
-                  >
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>${item.price.toFixed(2)}</TableCell>
-                    <TableCell>
-                      {item.inStock ? (
-                        <Badge variant="secondary">In Stock</Badge>
-                      ) : (
-                        <Badge variant="outline">Out of Stock</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>{item.reorderLevel}</TableCell>
-                    <TableCell>{item.lastOrderDate}</TableCell>
-                    <TableCell>{item.expiryDate}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-        {selectedItem && (
-          <div className="bg-background rounded-lg shadow-md p-6 flex-1">
-            <h2 className="text-xl font-bold mb-4">{selectedItem.name} Inventory Analysis</h2>
-            <div className="flex flex-col md:flex-row items-start gap-4">
-              <div className="bg-card rounded-lg p-4 flex-1">
-                <h3 className="text-lg font-bold mb-2">{selectedItem.name}</h3>
-                <div className="text-muted-foreground text-sm">
-                  {selectedItem.category} - Quantity: {selectedItem.quantity}
+      <div className="flex-1 p-6">
+        {showCategoryForm ? (
+          <div className="bg-background rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">Add New Item</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleAddItem()
+              }}
+            >
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter item name"
+                    value={newItem.name}
+                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                  />
                 </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select
+                    value={newItem.category}
+                    onValueChange={(value) => handleCategorySelect(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Medicine">Medicine</SelectItem>
+                      <SelectItem value="Surgical Tools">Surgical Tools</SelectItem>
+                      <SelectItem value="Others">Others</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="quantity">Quantity</Label>
+                  <Input
+                    id="quantity"
+                    type="number"
+                    placeholder="Enter quantity"
+                    value={newItem.quantity}
+                    onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="price">Price</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    placeholder="Enter price"
+                    value={newItem.price}
+                    onChange={(e) => setNewItem({ ...newItem, price: parseFloat(e.target.value) })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="reorderLevel">Reorder Level</Label>
+                  <Input
+                    id="reorderLevel"
+                    type="number"
+                    placeholder="Enter reorder level"
+                    value={newItem.reorderLevel}
+                    onChange={(e) => setNewItem({ ...newItem, reorderLevel: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="lastOrderDate">Last Order Date</Label>
+                  <Input
+                    id="lastOrderDate"
+                    type="date"
+                    value={newItem.lastOrderDate}
+                    onChange={(e) => setNewItem({ ...newItem, lastOrderDate: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <Input
+                    id="expiryDate"
+                    type="date"
+                    value={newItem.expiryDate}
+                    onChange={(e) => setNewItem({ ...newItem, expiryDate: e.target.value })}
+                  />
+                </div>
+                <Button type="submit" >Add Item</Button>
               </div>
-              <div className="flex-1">
-                <PieChartCustomChart className="aspect-[4/3]" />
-              </div>
-            </div>
+            </form>
           </div>
+        ) : (
+          <>
+            <div className="mb-6">
+              <Input
+                type="text"
+                placeholder="Search items"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="bg-background rounded-lg shadow-md p-6 mb-6">
+              <h2 className="text-xl font-bold mb-4">Inventory</h2>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>In Stock</TableHead>
+                    <TableHead>Reorder Level</TableHead>
+                    <TableHead>Last Order Date</TableHead>
+                    <TableHead>Expiry Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredInventory.map((item) => (
+                    <TableRow key={item.id} onClick={() => handleItemClick(item)}>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>${item.price.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge>
+                          {item.inStock ? "In Stock" : "Out of Stock"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{item.reorderLevel}</TableCell>
+                      <TableCell>{item.lastOrderDate}</TableCell>
+                      <TableCell>{item.expiryDate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {showPieChart && selectedItem && (
+              <Card>
+                <CardContent>
+                  <h2 className="text-xl font-bold mb-4">Item Analysis</h2>
+                  
+                    <PieChart width={400} height={400}>
+                      <CartesianGrid stroke="#f5f5f5" />
+                      <XAxis dataKey="name" />
+                      <Pie  data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+            
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
       </div>
     </div>
-  );
-}
-
-function InboxIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
-      <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-    </svg>
-  );
-}
-
-function SearchIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-  );
-}
-
-function PieChartCustomChart(props: { className?: string }) {
-  const data = [
-    { name: "In Stock", value: 60 },
-    { name: "Out of Stock", value: 40 },
-  ];
-
-  return (
-    <div className={props.className}>
-      <PieChart width={400} height={400}>
-        <Pie
-          data={data}
-          dataKey="value"
-          nameKey="name"
-          outerRadius={80}
-          fill="#8884d8"
-          label
-        />
-      </PieChart>
-    </div>
-  );
+  )
 }

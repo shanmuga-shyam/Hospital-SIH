@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Link } from "react-router-dom";
+
+// Type definitions
+interface PatientDetails {
+  name: string;
+  age: number;
+  gender: string;
+  reason: string;
+}
 
 interface Doctor {
   name: string;
   status: "online" | "offline";
 }
-
-type Patient = {
-  id: number;
-  name: string;
-  age: number;
-  gender: string;
-  reason: string;
-  status: "Waiting" | "In Progress" | "Completed";
-};
 
 const statusColors = {
   Waiting: "bg-red-500 text-red-50",
@@ -24,8 +26,9 @@ const statusColors = {
   Completed: "bg-green-500 text-green-50",
 };
 
-export function Admindashboard() { // Changed to default export
-  const [activeTab, setActiveTab] = useState<"active" | "inactive">("active");
+export function Admindashboard() {
+  const [activeView, setActiveView] = useState<"activeDoctors" | "inactiveDoctors" | "newPatientForm" | null>(null);
+  const [patientDetails, setPatientDetails] = useState<PatientDetails | null>(null);
   const [doctors, setDoctors] = useState<Doctor[]>([
     { name: "Dr. John Doe", status: "online" },
     { name: "Dr. Jane Smith", status: "online" },
@@ -34,148 +37,132 @@ export function Admindashboard() { // Changed to default export
     { name: "Dr. David Lee", status: "online" },
     { name: "Dr. Sarah Wilson", status: "offline" },
   ]);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [patients, setPatients] = useState<Patient[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      age: 35,
-      gender: "Male",
-      reason: "Flu symptoms",
-      status: "Waiting",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      age: 42,
-      gender: "Female",
-      reason: "Broken arm",
-      status: "In Progress",
-    },
-    {
-      id: 3,
-      name: "Michael Johnson",
-      age: 28,
-      gender: "Male",
-      reason: "Routine checkup",
-      status: "Completed",
-    },
-  ]);
 
-  const handleTabChange = (tab: "active" | "inactive") => {
-    setActiveTab(tab);
-    setSelectedDoctor(null);
-  };
+  const getActiveDoctors = () => doctors.filter((doctor) => doctor.status === "online");
 
-  const handleDoctorClick = (doctor: Doctor) => {
-    setSelectedDoctor(doctor);
-  };
+  const getInactiveDoctors = () => doctors.filter((doctor) => doctor.status === "offline");
 
-  const getActiveDoctors = () => {
-    return doctors.filter((doctor) => doctor.status === "online");
-  };
+  const renderActiveDoctors = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Active Doctors</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2">
+          {getActiveDoctors().map((doctor) => (
+            <li key={doctor.name} className="flex items-center justify-between cursor-pointer hover:bg-muted/50 rounded-md p-2">
+              <div className="font-medium">{doctor.name}</div>
+              <Badge variant="secondary">Online</Badge>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
 
-  const getInactiveDoctors = () => {
-    return doctors.filter((doctor) => doctor.status === "offline");
-  };
+  const renderInactiveDoctors = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Inactive Doctors</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2">
+          {getInactiveDoctors().map((doctor) => (
+            <li key={doctor.name} className="flex items-center justify-between cursor-pointer hover:bg-muted/50 rounded-md p-2">
+              <div className="font-medium">{doctor.name}</div>
+              <Badge variant="outline">Offline</Badge>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+
+  const renderNewPatientForm = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>New Patient</CardTitle>
+        <CardDescription>Enter the patient's Abha ID to get their details.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-[auto_1fr] gap-4">
+          <Label htmlFor="abha-id">Abha ID</Label>
+          <Input id="abha-id" placeholder="Enter Abha ID" />
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button
+            type="submit"
+            onClick={() => {
+              const newPatientDetails: PatientDetails = {
+                name: "Yas",
+                age: 20,
+                gender: "male",
+                reason: "",
+              };
+              setPatientDetails(newPatientDetails);
+              setActiveView(null); // Clear the active view when patient details are displayed
+            }}
+          >
+            Get Details
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="bg-background border-r w-64 p-6 flex flex-col gap-6">
-        <div className="flex justify-center">
-          <Button
-            onClick={() => handleTabChange("active")}
-            className={`rounded-md px-4 py-2 font-medium transition-colors ${
-              activeTab === "active"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            Active Doctors
-          </Button>
+    <div className="flex flex-col min-h-screen">
+      {/* Top Dashboard */}
+      <div className="flex items-center justify-between bg-gray-100 p-4 border-b">
+        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <Link to="/adminsignin"><Button className="ml-auto">Home</Button></Link>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-[280px_1fr] flex-1">
+        <div className="flex flex-col border-r bg-muted/40 p-4">
+          <div className="flex flex-col gap-4">
+            <Button onClick={() => setActiveView("newPatientForm")}>New Patient</Button>
+            <Button onClick={() => { setActiveView("activeDoctors"); setPatientDetails(null); }}>Active Doctors</Button>
+            <Button onClick={() => { setActiveView("inactiveDoctors"); setPatientDetails(null); }}>Inactive Doctors</Button>
+            
+          </div>
         </div>
-        <div className="flex justify-center">
-          <Button
-            onClick={() => handleTabChange("inactive")}
-            className={`rounded-md px-4 py-2 font-medium transition-colors ${
-              activeTab === "inactive"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            Inactive Doctors
-          </Button>
-        </div>
-      </aside>
-      <div className="flex-1 p-6 flex flex-col gap-6">
-        <div className="grid gap-4">
-          {activeTab === "active" && (
+        <div className="flex flex-col p-6">
+          {activeView === "activeDoctors" && renderActiveDoctors()}
+          {activeView === "inactiveDoctors" && renderInactiveDoctors()}
+          {activeView === "newPatientForm" && renderNewPatientForm()}
+          {patientDetails && !activeView && (
             <Card>
               <CardHeader>
-                <CardTitle>Active Doctors</CardTitle>
+                <CardTitle>Patient Details</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {getActiveDoctors().map((doctor) => (
-                    <li
-                      key={doctor.name}
-                      className="flex items-center justify-between cursor-pointer hover:bg-muted/50 rounded-md p-2"
-                      onClick={() => handleDoctorClick(doctor)}
-                    >
-                      <div className="font-medium">{doctor.name}</div>
-                      <Badge variant="secondary">Online</Badge>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          )}
-          {activeTab === "inactive" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Inactive Doctors</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {getInactiveDoctors().map((doctor) => (
-                    <li
-                      key={doctor.name}
-                      className="flex items-center justify-between cursor-pointer hover:bg-muted/50 rounded-md p-2"
-                      onClick={() => handleDoctorClick(doctor)}
-                    >
-                      <div className="font-medium">{doctor.name}</div>
-                      <Badge variant="outline">Offline</Badge>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-        {selectedDoctor && patients.map((patient) => (
-          <Card key={patient.id} className="relative">
-            <CardHeader className={`${statusColors[patient.status]} px-4 py-2 rounded-t-md`}>
-              <div className="absolute top-2 right-2 rounded-full bg-white px-2 py-1 text-xs font-medium">
-                {patient.status}
-              </div>
-              <div className="flex items-center gap-2">
-                <Avatar className="border-2 border-white">
-                  <AvatarImage src="/placeholder-user.jpg" alt={patient.name} />
-                  <AvatarFallback>{patient.name[0] + patient.name[1]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium">{patient.name}</div>
-                  <div className="text-sm">{`${patient.age} years old, ${patient.gender}`}</div>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" defaultValue={patientDetails.name} />
+                  </div>
+                  <div>
+                    <Label htmlFor="age">Age</Label>
+                    <Input id="age" type="number" defaultValue={patientDetails.age} />
+                  </div>
+                  <div>
+                    <Label htmlFor="gender">Gender</Label>
+                    <Input id="gender" defaultValue={patientDetails.gender} />
+                  </div>
+                  <div>
+                    <Label htmlFor="reason">Reason</Label>
+                    <Textarea id="reason" placeholder="Enter reason for visit" />
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="px-4 py-3">
-              <div className="text-sm text-muted-foreground">
-                Reason for visit: {patient.reason}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                <div className="flex justify-end gap-2">
+                  <Button type="submit">Enter</Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
