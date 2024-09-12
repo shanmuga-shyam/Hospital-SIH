@@ -1,4 +1,4 @@
-import {  PrismaClient } from "@prisma/client";
+import {  HospitalType, PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs"
 import validator from "validator"
 import jwt from "jsonwebtoken"
@@ -12,7 +12,7 @@ const createToken = (id) =>{
 
 const hospitalRegister = async (req,res)=>{
     try{
-        const {name,location,contact,email,password,type,city,state} = req.body;
+        const {name,location,contact,email,password,type,city,state,departments} = req.body;
         if(!validator.isEmail(email)){
             return res.json({success:false,message:"Email doesnot exist"});
         }
@@ -33,6 +33,18 @@ const hospitalRegister = async (req,res)=>{
                 password:hashedPass
             }
         })
+        if(departments && departments.length > 0){
+            const departmentPromises = departments.map(async(x)=>{
+                await prisma.departments.create({
+                    data:{
+                        name:x,
+                        hospitalId:newHospital.id,
+                        headOfDepartmentId:"abc",
+                    }
+                })
+            })
+            console.log(departmentPromises)
+        }
         const token = createToken(newHospital.id)
         console.log(token)
         res.json({success:true,message:newHospital,token:`Bearer ${token}`})
@@ -44,7 +56,7 @@ const hospitalRegister = async (req,res)=>{
 const hospitalLogin = async (req,res)=>{
     try{
         const {email,password} = req.body;
-        const Hospital = await prisma.hospitals.findUnique({
+        const Hospital = await prisma.hospitals.findMany({
             where:{
                 email:email
             }
@@ -56,7 +68,7 @@ const hospitalLogin = async (req,res)=>{
         if(!match){
             return res.json({success:false,message:"Invalid crediantails"})
         }
-        const token = await createToken(Hospital.id);
+        const token =createToken(Hospital.id);
         res.json({success:true,token:`Bearer ${token}`})
     }catch(err){
         console.log(err);
@@ -64,4 +76,19 @@ const hospitalLogin = async (req,res)=>{
     }
 }
 
-export {hospitalRegister,hospitalLogin}
+const getHospitals  = async(req,res) =>{
+    try{
+        const hospitals = await prisma.hospitals.findMany({
+            select:{
+                name:true,id:true
+            }
+        })
+        res.json({success:true,message:hospitals})
+    }catch(err){
+        console.log(err)
+        res.json({success:false,message:err})
+    }
+}
+
+
+export {hospitalRegister,hospitalLogin,getHospitals}
